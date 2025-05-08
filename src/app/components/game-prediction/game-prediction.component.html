@@ -1,0 +1,93 @@
+<div class="prediction-container">
+  <div *ngIf="loading" class="loading">
+    Loading today's prediction...
+  </div>
+  
+  <div *ngIf="error" class="error">
+    <p>Oops! We couldn't load today's prediction.</p>
+    <button mat-raised-button color="primary" (click)="loadPrediction()">Try Again</button>
+  </div>
+  
+  <div *ngIf="!loading && !error && prediction" class="prediction-content">
+    <mat-card class="game-card">
+      <mat-card-header>
+        <mat-card-title>Today's AI Pick</mat-card-title>
+        <mat-card-subtitle>{{ formatGameDate(prediction.game.startTime) }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="game-info">
+          <div class="sport-badge">{{ prediction.game.sport }}</div>
+          <div class="game-time">{{ formatGameTime(prediction.game.startTime) }}</div>
+          <div class="venue" *ngIf="prediction.game.venue">{{ prediction.game.venue }}</div>
+        </div>
+        
+        <div class="matchup">
+          <div class="team" [class.winner]="prediction.predictedWinner === 'home'">
+            <img *ngIf="prediction.game.homeTeam.logo" [src]="prediction.game.homeTeam.logo" alt="Home Team Logo" class="team-logo">
+            <div class="team-name">{{ prediction.game.homeTeam.name }}</div>
+            <div *ngIf="prediction.predictedWinner === 'home'" class="winner-badge">
+              <mat-icon>emoji_events</mat-icon>
+              <span>AI Pick</span>
+            </div>
+          </div>
+          
+          <div class="vs">VS</div>
+          
+          <div class="team" [class.winner]="prediction.predictedWinner === 'away'">
+            <img *ngIf="prediction.game.awayTeam.logo" [src]="prediction.game.awayTeam.logo" alt="Away Team Logo" class="team-logo">
+            <div class="team-name">{{ prediction.game.awayTeam.name }}</div>
+            <div *ngIf="prediction.predictedWinner === 'away'" class="winner-badge">
+              <mat-icon>emoji_events</mat-icon>
+              <span>AI Pick</span>
+            </div>
+          </div>
+        </div>
+        
+        <mat-divider></mat-divider>
+        
+        <div class="prediction-explanation">
+          <h3>Why {{ getWinnerTeam() }} Will Win</h3>
+          <p>{{ prediction.explanation }}</p>
+        </div>
+        
+        <div class="community-vote-results" *ngIf="getTotalVotes() > 0">
+          <h3>Community Vote Results</h3>
+          
+          <div class="result-row">
+            <div class="label">
+              <mat-icon color="primary">thumb_up</mat-icon>
+              <span>Agree</span>
+            </div>
+            <div class="progress-container">
+              <mat-progress-bar mode="determinate" [value]="calculateAgreePercentage()" color="primary"></mat-progress-bar>
+              <span class="percentage">{{ calculateAgreePercentage() }}%</span>
+            </div>
+          </div>
+          
+          <div class="result-row">
+            <div class="label">
+              <mat-icon color="warn">thumb_down</mat-icon>
+              <span>Disagree</span>
+            </div>
+            <div class="progress-container">
+              <mat-progress-bar mode="determinate" [value]="calculateDisagreePercentage()" color="warn"></mat-progress-bar>
+              <span class="percentage">{{ calculateDisagreePercentage() }}%</span>
+            </div>
+          </div>
+          
+          <div class="total-votes">
+            Total votes: {{ getTotalVotes() }}
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" class="share-button" (click)="shareOnTwitter()">
+            <mat-icon>share</mat-icon>
+            Share on Twitter
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

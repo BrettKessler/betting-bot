@@ -1,0 +1,41 @@
+mat-toolbar {
+  display: flex;
+  align-items: center;
+  background-color: var(--dark-bg);
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-family: Georgia, serif;
+  
+  a {
+    color: white;
+    text-decoration: none;
+    margin-left: 8px;
+    font-weight: 500;
+    
+    &.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-bottom: 2px solid var(--primary-green);
+    }
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 600px) {
+  .subtitle {
+    display: none;
+  }
+}

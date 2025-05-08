@@ -1,0 +1,53 @@
+<mat-card class="voting-widget" *ngIf="prediction">
+  <mat-card-header>
+    <mat-card-title>Do you agree with the AI's pick?</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="voting-buttons" *ngIf="!userVoted">
+      <button mat-raised-button color="primary" (click)="vote('agree')">
+        <mat-icon>thumb_up</mat-icon>
+        Agree
+      </button>
+      <button mat-raised-button color="warn" (click)="vote('disagree')">
+        <mat-icon>thumb_down</mat-icon>
+        Disagree
+      </button>
+    </div>
+    
+    <div class="voting-results" *ngIf="userVoted || totalVotes > 0">
+      <h3>Community Vote Results</h3>
+      
+      <div class="result-row">
+        <div class="label">
+          <mat-icon color="primary">thumb_up</mat-icon>
+          <span>Agree</span>
+        </div>
+        <div class="progress-container">
+          <mat-progress-bar mode="determinate" [value]="agreePercentage" color="primary"></mat-progress-bar>
+          <span class="percentage">{{ agreePercentage }}%</span>
+        </div>
+      </div>
+      
+      <div class="result-row">
+        <div class="label">
+          <mat-icon color="warn">thumb_down</mat-icon>
+          <span>Disagree</span>
+        </div>
+        <div class="progress-container">
+          <mat-progress-bar mode="determinate" [value]="disagreePercentage" color="warn"></mat-progress-bar>
+          <span class="percentage">{{ disagreePercentage }}%</span>
+        </div>
+      </div>
+      
+      <div class="total-votes">
+        Total votes: {{ totalVotes }}
+      </div>
+      
+      <div class="user-vote-message" *ngIf="userVoted">
+        <mat-icon>check_circle</mat-icon>
+        <span>You voted: <strong>{{ userVoted === 'agree' ? 'Agree' : 'Disagree' }}</strong></span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

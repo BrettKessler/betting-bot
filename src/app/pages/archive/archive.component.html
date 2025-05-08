@@ -1,0 +1,218 @@
+<div class="archive-container">
+  <app-header></app-header>
+  
+  <div class="content">
+    <h1 class="page-title">Prediction Archive</h1>
+    <p class="page-subtitle">Browse our AI's past predictions and see how the community voted</p>
+    
+    <div *ngIf="loading" class="loading-container">
+      <p>Loading archived predictions...</p>
+    </div>
+    
+    <div *ngIf="error" class="error-message">
+      <p>Oops! We couldn't load the archived predictions.</p>
+      <button mat-raised-button color="primary" (click)="loadArchivedPredictions()">Try Again</button>
+    </div>
+    
+    <div *ngIf="!loading && !error" class="filters-container">
+      <h2>Filters</h2>
+      
+      <div class="filters-grid">
+        <!-- Sport Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Sport</mat-label>
+          <mat-select [(ngModel)]="selectedSport" (selectionChange)="applyFilters()">
+            <mat-option value="">All Sports</mat-option>
+            <mat-option *ngFor="let sport of availableSports" [value]="sport">
+              {{ sport }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Date Range Filter -->
+        <div class="date-range-container">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="startPicker" [(ngModel)]="dateRange.start" (dateChange)="applyFilters()">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" [(ngModel)]="dateRange.end" (dateChange)="applyFilters()">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        
+        <!-- Team Name Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Team Name</mat-label>
+          <input matInput [(ngModel)]="teamFilter" (keyup.enter)="applyFilters()" placeholder="Search by team name">
+          <button *ngIf="teamFilter" matSuffix mat-icon-button aria-label="Clear" (click)="teamFilter=''; applyFilters()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        
+        <!-- Vote Percentage Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Min. Agreement %</mat-label>
+          <input matInput type="number" min="0" max="100" [(ngModel)]="votePercentageFilter" (change)="applyFilters()">
+          <mat-hint>Filter by minimum agreement percentage</mat-hint>
+        </mat-form-field>
+        
+        <!-- Sort Options -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Sort By</mat-label>
+          <mat-select [(ngModel)]="selectedSort" (selectionChange)="applyFilters()">
+            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      
+      <div class="filter-actions">
+        <button mat-raised-button color="primary" (click)="applyFilters()">Apply Filters</button>
+        <button mat-stroked-button (click)="resetFilters()">Reset Filters</button>
+      </div>
+      
+      <div class="filter-chips" *ngIf="selectedSport || dateRange.start || dateRange.end || teamFilter || votePercentageFilter !== null">
+        <mat-chip-set>
+          <mat-chip *ngIf="selectedSport" (removed)="selectedSport=''; applyFilters()">
+            Sport: {{ selectedSport }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          
+          <mat-chip *ngIf="dateRange.start" (removed)="dateRange.start = null; applyFilters()">
+            From: {{ dateRange.start | date }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          
+          <mat-chip *ngIf="dateRange.end" (removed)="dateRange.end = null; applyFilters()">
+            To: {{ dateRange.end | date }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          
+          <mat-chip *ngIf="teamFilter" (removed)="teamFilter=''; applyFilters()">
+            Team: {{ teamFilter }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          
+          <mat-chip *ngIf="votePercentageFilter !== null" (removed)="votePercentageFilter = null; applyFilters()">
+            Min. Agreement: {{ votePercentageFilter }}%
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+    
+    <div *ngIf="!loading && !error && filteredPredictions.length === 0" class="empty-state">
+      <p>No predictions match your filters.</p>
+      <button mat-stroked-button (click)="resetFilters()">Reset Filters</button>
+    </div>
+    
+    <div *ngIf="!loading && !error && archivedPredictions.length > 0" class="predictions-list">
+      <div class="results-summary">
+        <p>Showing {{ archivedPredictions.length }} of {{ totalPredictions }} predictions</p>
+      </div>
+      
+      <mat-card *ngFor="let prediction of archivedPredictions" class="prediction-card">
+        <mat-card-header>
+          <mat-card-title>{{ formatGameDate(prediction.date) }}</mat-card-title>
+          <mat-card-subtitle>{{ prediction.game.sport }}</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="matchup">
+            <div class="team" [class.winner]="prediction.predictedWinner === 'home'">
+              <img *ngIf="prediction.game.homeTeam.logo" [src]="prediction.game.homeTeam.logo" alt="Home Team Logo" class="team-logo">
+              <div class="team-name">{{ prediction.game.homeTeam.name }}</div>
+              <div *ngIf="prediction.predictedWinner === 'home'" class="winner-badge">
+                <mat-icon>emoji_events</mat-icon>
+                <span>AI Pick</span>
+              </div>
+            </div>
+            
+            <div class="vs">VS</div>
+            
+            <div class="team" [class.winner]="prediction.predictedWinner === 'away'">
+              <img *ngIf="prediction.game.awayTeam.logo" [src]="prediction.game.awayTeam.logo" alt="Away Team Logo" class="team-logo">
+              <div class="team-name">{{ prediction.game.awayTeam.name }}</div>
+              <div *ngIf="prediction.predictedWinner === 'away'" class="winner-badge">
+                <mat-icon>emoji_events</mat-icon>
+                <span>AI Pick</span>
+              </div>
+            </div>
+          </div>
+          
+          <mat-divider></mat-divider>
+          
+          <div class="prediction-explanation">
+            <h3>Why {{ getWinnerTeam(prediction) }} Was Picked</h3>
+            <p>{{ prediction.explanation }}</p>
+          </div>
+          
+          <div class="voting-results">
+            <h3>Community Vote Results</h3>
+            
+            <div class="result-row">
+              <div class="label">
+                <mat-icon color="primary">thumb_up</mat-icon>
+                <span>Agree</span>
+              </div>
+              <div class="progress-container">
+                <mat-progress-bar mode="determinate" [value]="calculateAgreePercentage(prediction)" color="primary"></mat-progress-bar>
+                <span class="percentage">{{ calculateAgreePercentage(prediction) }}%</span>
+              </div>
+            </div>
+            
+            <div class="result-row">
+              <div class="label">
+                <mat-icon color="warn">thumb_down</mat-icon>
+                <span>Disagree</span>
+              </div>
+              <div class="progress-container">
+                <mat-progress-bar mode="determinate" [value]="calculateDisagreePercentage(prediction)" color="warn"></mat-progress-bar>
+                <span class="percentage">{{ calculateDisagreePercentage(prediction) }}%</span>
+              </div>
+            </div>
+            
+            <div class="total-votes">
+              Total votes: {{ getTotalVotes(prediction) }}
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- Pagination -->
+      <mat-paginator
+        *ngIf="totalPredictions > 0"
+        [length]="totalPredictions"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="pageIndex"
+        (page)="onPageChange($event)"
+        aria-label="Select page of predictions">
+      </mat-paginator>
+    </div>
+  </div>
+  
+  <footer>
+    <div class="footer-content">
+      <p>Bot Bet of the Day - AI-powered sports predictions for entertainment purposes only</p>
+      <p class="disclaimer">No real betting or money involved. All predictions are generated by AI and should not be used for actual gambling.</p>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,79 @@
+<mat-card class="performance-card">
+  <mat-card-header>
+    <mat-card-title>Performance Comparison</mat-card-title>
+    <mat-card-subtitle>Bot vs. Human win rates over the last 30 days</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="chart-container" (window:resize)="onResize($event)">
+      <ngx-charts-line-chart
+        [view]="view"
+        [scheme]="colorScheme"
+        [results]="performanceData"
+        [gradient]="false"
+        [xAxis]="xAxis"
+        [yAxis]="yAxis"
+        [legend]="legend"
+        [showXAxisLabel]="showXAxisLabel"
+        [showYAxisLabel]="showYAxisLabel"
+        [xAxisLabel]="xAxisLabel"
+        [yAxisLabel]="yAxisLabel"
+        [animations]="animations"
+        [timeline]="timeline"
+        [autoScale]="true"
+        [yScaleMin]="0"
+        [yScaleMax]="100">
+      </ngx-charts-line-chart>
+    </div>
+    
+    <div class="stats-container" *ngIf="stats">
+      <div class="stat-section">
+        <h3 class="section-title">Bot Stats</h3>
+        <div class="stat-row">
+          <div class="stat-item">
+            <div class="stat-label">Total Predictions</div>
+            <div class="stat-value">{{ stats.totalPredictions }}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Correct Predictions</div>
+            <div class="stat-value">{{ stats.correctPredictions }}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Accuracy</div>
+            <div class="stat-value">{{ stats.accuracy | number:'1.1-1' }}%</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Current Streak</div>
+            <div class="stat-value">{{ stats.streak }} wins</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comparison-section">
+        <h3 class="section-title">Win Rate Comparison</h3>
+        <div class="comparison-row">
+          <div class="comparison-item bot">
+            <div class="comparison-label">Bot Win Rate</div>
+            <div class="comparison-value">{{ stats.botWinRate | number:'1.1-1' }}%</div>
+            <div class="comparison-bar">
+              <div class="bar-fill bot-bar" [style.width.%]="stats.botWinRate"></div>
+            </div>
+          </div>
+          <div class="comparison-item human">
+            <div class="comparison-label">Human Win Rate</div>
+            <div class="comparison-value">{{ stats.humanWinRate | number:'1.1-1' }}%</div>
+            <div class="comparison-bar">
+              <div class="bar-fill human-bar" [style.width.%]="stats.humanWinRate"></div>
+            </div>
+          </div>
+          <div class="comparison-result">
+            <div class="result-label">Difference</div>
+            <div class="result-value" [ngClass]="{'positive': stats.botWinRate > stats.humanWinRate, 'negative': stats.botWinRate < stats.humanWinRate}">
+              {{ (stats.botWinRate - stats.humanWinRate) | number:'1.1-1' }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

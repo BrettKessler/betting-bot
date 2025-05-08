@@ -1,0 +1,245 @@
+.prediction-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  color: #d32f2f;
+}
+
+.game-card {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--template-bg);
+}
+
+mat-card-header {
+  background-color: var(--home-bg);
+  padding: 16px;
+}
+
+mat-card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: Georgia, serif;
+  color: var(--text-color);
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sport-badge {
+  background-color: var(--primary-green);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+.game-time, .venue {
+  color: var(--text-color);
+  font-size: 0.9rem;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.matchup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+  padding: 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.team.winner {
+  background-color: rgba(92, 184, 110, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(92, 184, 110, 0.3);
+}
+
+.team-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.team-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  font-family: Georgia, serif;
+  color: var(--text-color);
+}
+
+.vs {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--dark-bg);
+  font-family: Georgia, serif;
+}
+
+.winner-badge {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  color: var(--primary-green);
+  font-weight: 500;
+  font-family: Georgia, serif;
+}
+
+.winner-badge mat-icon {
+  margin-right: 4px;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+mat-divider {
+  margin: 24px 0;
+}
+
+.prediction-explanation {
+  padding: 0 16px 16px;
+}
+
+.community-vote-results {
+  padding: 0 16px 16px;
+  margin-top: 20px;
+  
+  h3 {
+    color: var(--dark-bg);
+    margin-bottom: 16px;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  
+  .result-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .label {
+      display: flex;
+      align-items: center;
+      width: 100px;
+      margin-right: 16px;
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+      
+      span {
+        font-family: Georgia, serif;
+      }
+    }
+    
+    .progress-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      
+      mat-progress-bar {
+        flex: 1;
+      }
+      
+      .percentage {
+        width: 50px;
+        text-align: right;
+        margin-left: 12px;
+        font-weight: 500;
+        font-family: Georgia, serif;
+      }
+    }
+  }
+  
+  .total-votes {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-top: 8px;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 0 16px 16px;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: Georgia, serif;
+  font-weight: 500;
+  
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+  
+  &:hover {
+    background-color: darken(#5CB86E, 5%);
+  }
+}
+
+.prediction-explanation h3 {
+  color: var(--dark-bg);
+  margin-bottom: 12px;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.prediction-explanation p {
+  line-height: 1.7;
+  color: var(--text-color);
+  font-family: Georgia, serif;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .matchup {
+    flex-direction: column;
+  }
+  
+  .team {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .vs {
+    margin: 16px 0;
+  }
+}
