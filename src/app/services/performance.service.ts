@@ -8,13 +8,27 @@ import { PerformanceData, PerformanceStats } from '../models/performance.model';
   providedIn: 'root'
 })
 export class PerformanceService {
-  private apiUrl = 'http://localhost:3000/api/db';
+  private apiUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) { }
 
   getPerformanceData(): Observable<PerformanceData[]> {
     // Try to get performance data from the API, fall back to generating mock data if it fails
-    return this.http.get<PerformanceData[]>(`${this.apiUrl}/performance/data`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/performance/data`).pipe(
+      map(response => {
+        // Ensure we're returning an array
+        if (Array.isArray(response)) {
+          return response;
+        } else if (response && typeof response === 'object') {
+          // If it's an object but not an array, try to convert it to an array if possible
+          // For example, if it has properties that should be array items
+          const possibleArray = Object.values(response).filter(item => 
+            item && typeof item === 'object' && 'name' in item && 'series' in item
+          );
+          return possibleArray.length > 0 ? possibleArray : [];
+        }
+        return [];
+      }),
       catchError(error => {
         console.error('Error fetching performance data from API', error);
         return this.generateMockPerformanceData();

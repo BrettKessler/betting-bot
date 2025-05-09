@@ -29,17 +29,39 @@ export class PerformanceChartComponent implements OnInit {
   yAxisLabel: string = 'Percentage';
   timeline: boolean = false;
   colorScheme: string = 'cool';
+  chartReady: boolean = false;
   
   constructor(private performanceService: PerformanceService) {}
   
   ngOnInit(): void {
     this.loadPerformanceData();
     this.loadStats();
+    
+    // Set initial view size based on window width
+    this.setInitialViewSize();
+  }
+  
+  private setInitialViewSize(): void {
+    // Wait for DOM to be ready
+    setTimeout(() => {
+      // Check if window is available (client-side only)
+      if (typeof window !== 'undefined') {
+        const containerWidth = window.innerWidth;
+        // Use a safe default if width is not available or is too small
+        const width = containerWidth > 0 ? Math.min(containerWidth * 0.8, 900) : 700;
+        this.view = [width, 300];
+      } else {
+        // Server-side rendering - use default values
+        this.view = [700, 300];
+      }
+      this.chartReady = true;
+    }, 0);
   }
   
   loadPerformanceData(): void {
     this.performanceService.getPerformanceData().subscribe(data => {
-      this.performanceData = data;
+      // Ensure data is an array before assigning it
+      this.performanceData = Array.isArray(data) ? data : [];
     });
   }
   
@@ -50,6 +72,15 @@ export class PerformanceChartComponent implements OnInit {
   }
   
   onResize(event: any): void {
-    this.view = [event.target.innerWidth / 1.35, 300];
+    // Only run in browser environment
+    if (typeof window !== 'undefined') {
+      const width = event.target.innerWidth;
+      // Ensure we never set invalid dimensions
+      if (width > 0) {
+        this.view = [Math.min(width / 1.35, 900), 300];
+      } else {
+        this.view = [700, 300]; // Safe fallback
+      }
+    }
   }
 }

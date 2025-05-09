@@ -6,7 +6,11 @@
   
   <mat-card-content>
     <div class="chart-container" (window:resize)="onResize($event)">
+      <div *ngIf="!chartReady || performanceData.length === 0" class="loading-chart">
+        <p>Loading performance data...</p>
+      </div>
       <ngx-charts-line-chart
+        *ngIf="chartReady && performanceData.length > 0"
         [view]="view"
         [scheme]="colorScheme"
         [results]="performanceData"

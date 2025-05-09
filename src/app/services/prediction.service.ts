@@ -9,7 +9,7 @@ import { map, switchMap, take, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PredictionService {
-  private apiUrl = 'http://localhost:3000/api/db';
+  private apiUrl = 'http://localhost:3000/api';
   private predictionSubject = new BehaviorSubject<Prediction | undefined>(undefined);
   private archivedPredictions: Prediction[] = [];
   private predictionExplanations = [
@@ -31,8 +31,10 @@ export class PredictionService {
 
   private loadArchivedPredictions() {
     // Try to get archived predictions from the API, fall back to generating mock data if it fails
-    this.http.get<any[]>(`${this.apiUrl}/predictions`).pipe(
-      map(predictions => {
+    this.http.get<any>(`${this.apiUrl}/archives`).pipe(
+      map(response => {
+        // Ensure we have an array of predictions
+        const predictions = Array.isArray(response) ? response : [];
         // Convert string dates to Date objects and ensure game objects are properly formatted
         // Also map MongoDB _id to id for the Angular model
         return predictions.map(prediction => ({
@@ -113,7 +115,7 @@ export class PredictionService {
 
   private loadDailyPrediction() {
     // Try to get the latest prediction from the API
-    this.http.get<any>(`${this.apiUrl}/predictions/latest`).pipe(
+    this.http.get<any>(`${this.apiUrl}/predictions`).pipe(
       map(prediction => {
         // Convert string dates to Date objects and ensure game object is properly formatted
         // Also map MongoDB _id to id for the Angular model
@@ -214,7 +216,7 @@ export class PredictionService {
 
   updateVotes(predictionId: string, voteType: 'agree' | 'disagree'): Observable<Prediction | undefined> {
     // Try to update votes in the API
-    return this.http.post<any>(`${this.apiUrl}/predictions/${predictionId}/vote`, { voteType }).pipe(
+    return this.http.put<any>(`${this.apiUrl}/predictions/${predictionId}/votes`, { voteType }).pipe(
       map(prediction => {
         // Convert string dates to Date objects and ensure game object is properly formatted
         // Also map MongoDB _id to id for the Angular model
@@ -276,8 +278,10 @@ export class PredictionService {
 
   getArchivedPredictions(): Observable<Prediction[]> {
     // Try to get archived predictions from the API, fall back to local data if it fails
-    return this.http.get<any[]>(`${this.apiUrl}/predictions`).pipe(
-      map(predictions => {
+    return this.http.get<any>(`${this.apiUrl}/archives`).pipe(
+      map(response => {
+        // Ensure we have an array of predictions
+        const predictions = Array.isArray(response) ? response : [];
         // Convert string dates to Date objects and ensure game objects are properly formatted
         // Also map MongoDB _id to id for the Angular model
         return predictions.map(prediction => ({
