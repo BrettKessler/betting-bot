@@ -119,4 +119,27 @@ export class GamePredictionComponent implements OnInit {
     if (!this.prediction) return 0;
     return this.prediction.votes.agree + this.prediction.votes.disagree;
   }
+
+  handleImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.style.display = 'none';
+    // Find the parent element and add a placeholder
+    const parentElement = imgElement.parentElement;
+    if (parentElement) {
+      const teamName = parentElement.querySelector('.team-name')?.textContent || '';
+      const placeholderDiv = document.createElement('div');
+      placeholderDiv.className = 'team-logo-placeholder';
+      placeholderDiv.textContent = this.getTeamInitials(teamName);
+      parentElement.insertBefore(placeholderDiv, imgElement.nextSibling);
+    }
+  }
+
+  getTeamInitials(teamName: string): string {
+    if (!teamName) return '';
+    // Split the team name by spaces and get the first letter of each word
+    return teamName.split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase();
+  }
 }

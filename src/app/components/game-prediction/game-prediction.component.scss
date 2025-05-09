@@ -88,6 +88,21 @@ mat-card-title {
   margin-bottom: 12px;
 }
 
+.team-logo-placeholder {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+  border: 2px solid #ddd;
+}
+
 .team-name {
   font-size: 1.2rem;
   font-weight: 700;

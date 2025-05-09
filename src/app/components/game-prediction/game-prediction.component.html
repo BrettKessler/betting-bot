@@ -24,7 +24,11 @@
         
         <div class="matchup">
           <div class="team" [class.winner]="prediction.predictedWinner === 'home'">
-            <img *ngIf="prediction.game.homeTeam.logo" [src]="prediction.game.homeTeam.logo" alt="Home Team Logo" class="team-logo">
+            <img *ngIf="prediction.game.homeTeam.logo" [src]="prediction.game.homeTeam.logo" 
+                 (error)="handleImageError($event)" alt="Home Team Logo" class="team-logo">
+            <div *ngIf="!prediction.game.homeTeam.logo" class="team-logo-placeholder">
+              {{ getTeamInitials(prediction.game.homeTeam.name) }}
+            </div>
             <div class="team-name">{{ prediction.game.homeTeam.name }}</div>
             <div *ngIf="prediction.predictedWinner === 'home'" class="winner-badge">
               <mat-icon>emoji_events</mat-icon>
@@ -35,7 +39,11 @@
           <div class="vs">VS</div>
           
           <div class="team" [class.winner]="prediction.predictedWinner === 'away'">
-            <img *ngIf="prediction.game.awayTeam.logo" [src]="prediction.game.awayTeam.logo" alt="Away Team Logo" class="team-logo">
+            <img *ngIf="prediction.game.awayTeam.logo" [src]="prediction.game.awayTeam.logo" 
+                 (error)="handleImageError($event)" alt="Away Team Logo" class="team-logo">
+            <div *ngIf="!prediction.game.awayTeam.logo" class="team-logo-placeholder">
+              {{ getTeamInitials(prediction.game.awayTeam.name) }}
+            </div>
             <div class="team-name">{{ prediction.game.awayTeam.name }}</div>
             <div *ngIf="prediction.predictedWinner === 'away'" class="winner-badge">
               <mat-icon>emoji_events</mat-icon>

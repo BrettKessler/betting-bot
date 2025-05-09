@@ -138,6 +138,23 @@ mat-progress-bar {
   margin-right: 8px;
 }
 
+.voting-disabled-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  padding: 12px;
+  background-color: rgba(255, 152, 0, 0.1);
+  border-radius: 4px;
+  color: #ff9800;
+  font-family: Georgia, serif;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.voting-disabled-message mat-icon {
+  margin-right: 8px;
+}
+
 @media (max-width: 600px) {
   .voting-buttons {
     flex-direction: column;

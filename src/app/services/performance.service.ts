@@ -1,14 +1,66 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { PerformanceData, PerformanceStats } from '../models/performance.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PerformanceService {
-  constructor() { }
+  private apiUrl = 'http://localhost:3000/api/db';
+
+  constructor(private http: HttpClient) { }
 
   getPerformanceData(): Observable<PerformanceData[]> {
+    // Try to get performance data from the API, fall back to generating mock data if it fails
+    return this.http.get<PerformanceData[]>(`${this.apiUrl}/performance/data`).pipe(
+      catchError(error => {
+        console.error('Error fetching performance data from API', error);
+        return this.generateMockPerformanceData();
+      })
+    );
+  }
+  
+  getPerformanceStats(): Observable<PerformanceStats> {
+    // Try to get performance stats from the API, fall back to generating mock stats if it fails
+    return this.http.get<PerformanceStats>(`${this.apiUrl}/performance/stats`).pipe(
+      map(stats => ({
+        ...stats,
+        lastUpdated: new Date(stats.lastUpdated)
+      })),
+      catchError(error => {
+        console.error('Error fetching performance stats from API', error);
+        return this.generateMockPerformanceStats();
+      })
+    );
+  }
+
+  generateInitialPerformanceData(): Observable<any> {
+    // Generate initial performance data in the database
+    return this.http.post<any>(`${this.apiUrl}/performance/generate-initial-data`, {}).pipe(
+      catchError(error => {
+        console.error('Error generating initial performance data', error);
+        return of({ error: error.message });
+      })
+    );
+  }
+
+  updatePerformanceStatsFromPredictions(): Observable<PerformanceStats> {
+    // Update performance stats based on prediction results
+    return this.http.post<PerformanceStats>(`${this.apiUrl}/performance/stats/update-from-predictions`, {}).pipe(
+      map(stats => ({
+        ...stats,
+        lastUpdated: new Date(stats.lastUpdated)
+      })),
+      catchError(error => {
+        console.error('Error updating performance stats from predictions', error);
+        return this.generateMockPerformanceStats();
+      })
+    );
+  }
+
+  private generateMockPerformanceData(): Observable<PerformanceData[]> {
     // Generate fake data for the past 30 days
     const today = new Date();
     const accuracyData: PerformanceData = {
@@ -65,7 +117,7 @@ export class PerformanceService {
     return of([accuracyData, winRateData, humanWinRateData]);
   }
   
-  getPerformanceStats(): Observable<PerformanceStats> {
+  private generateMockPerformanceStats(): Observable<PerformanceStats> {
     // Generate fake stats
     const stats: PerformanceStats = {
       totalPredictions: 124,

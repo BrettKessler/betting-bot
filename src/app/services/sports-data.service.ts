@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Game } from '../models/game.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SportsDataService {
+  private apiUrl = 'http://localhost:3000/api';
   private dummyGames: Game[] = [
     {
       id: '1',
@@ -57,15 +60,67 @@ export class SportsDataService {
     }
   ];
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   getGames(): Observable<Game[]> {
-    // In a real app, this would be an HTTP call to a sports API
-    return of(this.dummyGames);
+    // Try to get games from the API, fall back to dummy data if it fails
+    return this.http.get<Game[]>(`${this.apiUrl}/games`).pipe(
+      map(games => {
+        // Convert string dates to Date objects
+        return games.map(game => ({
+          ...game,
+          startTime: new Date(game.startTime)
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching games from API', error);
+        return of(this.dummyGames);
+      })
+    );
   }
 
   getGameById(id: string): Observable<Game | undefined> {
-    const game = this.dummyGames.find(g => g.id === id);
-    return of(game);
+    // Try to get game from the API, fall back to dummy data if it fails
+    return this.http.get<Game>(`${this.apiUrl}/games/${id}`).pipe(
+      map(game => ({
+        ...game,
+        startTime: new Date(game.startTime)
+      })),
+      catchError(error => {
+        console.error(`Error fetching game with ID ${id} from API`, error);
+        const game = this.dummyGames.find(g => g.id === id);
+        return of(game);
+      })
+    );
+  }
+
+  getUpcomingGames(limit: number = 10): Observable<Game[]> {
+    return this.http.get<Game[]>(`${this.apiUrl}/games/upcoming?limit=${limit}`).pipe(
+      map(games => {
+        return games.map(game => ({
+          ...game,
+          startTime: new Date(game.startTime)
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching upcoming games from API', error);
+        return of(this.dummyGames);
+      })
+    );
+  }
+
+  getGamesBySport(sport: string): Observable<Game[]> {
+    return this.http.get<Game[]>(`${this.apiUrl}/games/sport/${sport}`).pipe(
+      map(games => {
+        return games.map(game => ({
+          ...game,
+          startTime: new Date(game.startTime)
+        }));
+      }),
+      catchError(error => {
+        console.error(`Error fetching games for sport ${sport} from API`, error);
+        return of(this.dummyGames.filter(g => g.sport === sport));
+      })
+    );
   }
 }
